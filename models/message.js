@@ -2,7 +2,9 @@
 
 const db = require("../db");
 const ExpressError = require("../expressError");
-
+const {TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN} = require("../config"); 
+const client = require("../db");
+const twilio = require("twilio")(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
 /** Message on the site. */
 
@@ -24,6 +26,15 @@ class Message {
         [from_username, to_username, body]);
 
     return result.rows[0];
+  }
+
+  static async send(message) {
+    let msg = await Message.get(message.id);
+    console.log(msg);
+    twilio.messages
+      .create({body: msg.body, from: msg.from_user.phone, to: msg.to_user.phone})
+      .then(message => console.log(message.sid));
+    return twilio;
   }
 
   /** Update read_at for message */

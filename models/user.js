@@ -13,10 +13,6 @@ class User {
    */
 
   static async register({ username, password, first_name, last_name, phone }) {
-    if (!username || !password) {
-      throw new ExpressError("username or password invalid", 404);
-    }
-
     const hashP = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
     const result = await db.query(
       `INSERT INTO users (username, password, first_name, last_name, phone, join_at, last_login_at)
@@ -88,7 +84,7 @@ class User {
       [username]
     );
     if (!result.rows[0]) {
-      throw new ExpressError(`No such user: ${username}`, 404)
+      throw new ExpressError(`No such user: ${username}`, 401)
     }
     return result.rows[0];
   }
